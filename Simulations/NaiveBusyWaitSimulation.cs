@@ -17,6 +17,7 @@ public static class NaiveBusyWaitSimulation
         int elvesServed = 0;
         int maxWaiting = 0;
         int reindeerServed = 0;
+        long spinIterations = 0;
 
         Task[] reindeerTasks = Enumerable.Range(1, SimulationConfig.ReindeerCount)
             .Select(async id =>
@@ -39,6 +40,7 @@ public static class NaiveBusyWaitSimulation
                 while (Volatile.Read(ref elvesServed) < ticket &&
                        Volatile.Read(ref reindeerReturned) < SimulationConfig.ReindeerCount)
                 {
+                    Interlocked.Increment(ref spinIterations);
                     spin.SpinOnce(); // consome CPU enquanto aguarda
                 }
 
@@ -63,6 +65,7 @@ public static class NaiveBusyWaitSimulation
                 }
                 else
                 {
+                    Interlocked.Increment(ref spinIterations);
                     spin.SpinOnce(); // não dorme nem aguarda sinal: fica consultando os contadores
                 }
             }
@@ -80,8 +83,16 @@ public static class NaiveBusyWaitSimulation
         if (showReport)
         {
             Console.WriteLine("[PROBLEMA] O Papai Noel consulta os contadores continuamente, gastando CPU sem realizar trabalho útil.");
-            Console.WriteLine($"Renas atendidas: {reindeerServed}; elfos atendidos: {elvesServed}; máximo de elfos na fila observado: {maxWaiting}.");
-            Console.WriteLine($"Tempo total: {timer.Elapsed.TotalMilliseconds:F2} ms");
+            Console.WriteLine("===== RELATÓRIO · PAPAI NOEL =====");
+            Console.WriteLine("Solução: INGÊNUA 2 (espera ocupada)");
+            Console.WriteLine($"Renas que retornaram ........ {reindeerReturned}/{SimulationConfig.ReindeerCount}");
+            Console.WriteLine($"Renas atendidas/liberadas ... {reindeerServed}");
+            Console.WriteLine($"Elfos que chegaram .......... {elvesArrived}/{SimulationConfig.ElfCount}");
+            Console.WriteLine($"Elfos atendidos ............. {elvesServed}");
+            Console.WriteLine($"Grupos de 3 atendidos ....... {groups}");
+            Console.WriteLine($"Máximo na fila observado ... {maxWaiting}");
+            Console.WriteLine($"Iterações de espera ocupada . {spinIterations:N0}");
+            Console.WriteLine($"Tempo total ................. {timer.Elapsed.TotalMilliseconds:F2} ms");
         }
         return timer.Elapsed;
     }

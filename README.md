@@ -1,5 +1,7 @@
 # Trabalho N3 — Problema do Papai Noel
 
+**Versão desta entrega: Entrega 2 — duas soluções ingênuas e menu.**
+
 **Aluno:** [preencha seu nome]  
 **Disciplina:** Desenvolvimento para Concorrência (ESW240)  
 **Linguagem:** C# / .NET 10  
@@ -42,7 +44,7 @@ O contador de renas é atualizado sem `lock` nem operação atômica. Cada Task 
 
 O Papai Noel consulta repetidamente os contadores em um laço com `SpinWait`, sem aguardar um sinal. Os elfos também consultam continuamente se já foram atendidos.
 
-**Problema provocado:** consumo desnecessário de CPU enquanto as Tasks aguardam. A versão usa operações atômicas para que a demonstração foque na espera ocupada, e não em uma segunda condição de corrida.
+**Problema provocado:** consumo desnecessário de CPU enquanto as Tasks aguardam. A versão usa operações atômicas para que a demonstração foque na espera ocupada, e não em uma segunda condição de corrida. O relatório registra a quantidade de iterações do laço, além dos contadores de renas, elfos e grupos atendidos.
 
 ### 4.3 Solução ideal — `SemaphoreSlim` e `lock`
 
